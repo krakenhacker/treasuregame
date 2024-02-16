@@ -1,18 +1,19 @@
 package Models;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Game {
+public class Game implements Serializable {
 
     private Long id;
 
     private String name;
 
-    private LocalDateTime start;
+    private String start;
 
     private double duration;
 
@@ -28,7 +29,7 @@ public class Game {
     public Game() {
     }
 
-    public Game(Long id, String name, LocalDateTime start,double duration, double x, double y, double z, double w) {
+    public Game(Long id, String name, String start,double duration, double x, double y, double z, double w) {
         this.id = id;
         this.name = name;
         this.start = start;
@@ -39,7 +40,7 @@ public class Game {
         this.w = w;
     }
 
-    public Game(String name, LocalDateTime start,double duration, double x, double y, double z, double w) {
+    public Game(String name, String start,double duration, double x, double y, double z, double w) {
         this.name = name;
         this.start = start;
         this.duration = duration;
@@ -106,12 +107,24 @@ public class Game {
         this.duration = duration;
     }
 
-    public LocalDateTime getStart() {
+    public String getStart() {
         return start;
     }
 
-    public void setStart(LocalDateTime start) {
+    public void setStart(String start) {
         this.start = start;
     }
-
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", start=" + start +
+                ", duration=" + duration +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", w=" + w +
+                '}';
+    }
 }
