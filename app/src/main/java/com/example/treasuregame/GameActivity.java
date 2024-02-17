@@ -1,12 +1,14 @@
 package com.example.treasuregame;
 
 import Models.Game;
+import android.content.Intent;
+import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class activity_game extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
     private TextView textViewGame;
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -27,5 +29,9 @@ public class activity_game extends AppCompatActivity {
 //        } catch (JsonProcessingException e) {
 //            throw new RuntimeException(e);
 //        }
+    }
+
+    public void TerminateGame(View view) {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 }
