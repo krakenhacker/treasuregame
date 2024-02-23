@@ -116,7 +116,7 @@ public class Game implements Serializable {
     }
     @Override
     public String toString() {
-        return "Game{" +
+        return "{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", start=" + start +

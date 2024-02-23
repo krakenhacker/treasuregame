@@ -10,32 +10,49 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.android.volley.*;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class GameActivity extends AppCompatActivity implements LocationListener {
 
     private TextView textViewGame;
 
     ObjectMapper objectMapper = new ObjectMapper();
-    Game game;
 
     LocationManager locationManager;
+    public int count=0;
+    public int gameid=0;
+    public Game game;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        Game game = (Game) getIntent().getSerializableExtra("Game");
+        game = (Game) getIntent().getSerializableExtra("Game");
         textViewGame = findViewById(R.id.textViewGame);
         textViewGame.setText(game.toString());
+        gameid = Math.toIntExact(game.getId());
         getLocation();
 //        try {
 //            game = objectMapper.readValue(gamestring, Game.class);
@@ -59,6 +76,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 
 
     public void TerminateGame(View view) {
+        count=0;
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
     }
 
@@ -67,7 +85,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 
         try {
             locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, GameActivity.this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, GameActivity.this);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,19 +93,37 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     }
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        Toast.makeText(this, ""+location.getLatitude()+","+location.getLongitude(), Toast.LENGTH_SHORT).show();
-        try {
-            getLocation();
-//            Geocoder geocoder = new Geocoder(GameActivity.this, Locale.getDefault());
-//            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-//            String address = addresses.get(0).getAddressLine(0);
+        double puzzlelong = 2615509.495452444;
+        double puzzlelat = 5027049.732337592;
+        if ((Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180)) < 100) && Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180) < 100) {
+            Toast.makeText(this, "" + (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180 + "," + location.getLongitude() * 20037508.34 / 180, Toast.LENGTH_SHORT).show();
 
-//            textViewGame.setText(location.getLatitude()+" + "+location.getLongitude());
 
-        }catch (Exception e){
-            e.printStackTrace();
+            RequestQueue queue = Volley.newRequestQueue(this);
+
+            String url = "http://10.0.2.2:8080/api/v1/gamepuzzles/bygameid/" + game.getId();
+
+// Request a string response from the provided URL.
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // Display the first 500 characters of the response string.
+                            ObjectMapper objectMapper = new ObjectMapper();
+//                            textViewResult.setText(game.toString());
+                                textViewGame.setText(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    textViewGame.setText(error.toString());
+                }
+            });
+
+// Add the request to the RequestQueue.
+            queue.add(stringRequest);
+
         }
-
     }
 
     @Override
