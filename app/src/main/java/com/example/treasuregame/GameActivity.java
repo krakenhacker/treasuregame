@@ -71,6 +71,28 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
                     Manifest.permission.ACCESS_FINE_LOCATION
             },100);
         }
+
+        DisplayGamePuzzle(count);
+
+
+
+
+    }
+
+
+
+
+    public void TerminateGame(View view) {
+        count=0;
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
+    public void GameFinished(){
+        count=0;
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    }
+
+    public void DisplayGamePuzzle(int puzzlecount){
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = "http://10.0.2.2:8080/api/v1/gamepuzzles/bygameid/" + game.getId();
@@ -85,6 +107,9 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 
                         try {
                             gamePuzzlesList = objectMapper.readValue(response, new TypeReference<List<gamePuzzles>>() {});
+                            puzzlelong = gamePuzzlesList.get(puzzlecount).getX();
+                            puzzlelat = gamePuzzlesList.get(puzzlecount).getY();
+                            textViewGame.setText(gamePuzzlesList.get(count).getPuzzle());
 
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
@@ -101,18 +126,14 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
 
-
-
-
-
     }
-
-
-
-
-    public void TerminateGame(View view) {
-        count=0;
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+    public void GetPuzzleCoordinates(int puzzlecount){
+        if (puzzlecount<gamePuzzlesList.size()) {
+            puzzlelong = gamePuzzlesList.get(puzzlecount).getX();
+            puzzlelat = gamePuzzlesList.get(puzzlecount).getY();
+        }else{
+            GameFinished();
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -128,17 +149,16 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     }
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        puzzlelong = gamePuzzlesList.get(count).getX();
-        puzzlelat = gamePuzzlesList.get(count).getY();
-        textViewGame.setText(gamePuzzlesList.get(count).getPuzzle());
 
-        if ((Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180)) < 100) && Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180) < 100) {
+    GetPuzzleCoordinates(count+1);
+
+        if ((Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180)) < 10) && Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180) < 10) {
             Toast.makeText(this, "" + (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180 + "," + location.getLongitude() * 20037508.34 / 180, Toast.LENGTH_SHORT).show();
+            DisplayGamePuzzle(count);
 
-
-
+            count++;
         }
-        count++;
+
     }
 
     @Override
