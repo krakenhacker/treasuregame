@@ -11,20 +11,25 @@ public class gamePuzzles {
     private String answer;
     private double x;
     private double y;
-    public gamePuzzles(Long id, Game game, String puzzle, String answer, double x, double y) {
+
+    private String hint;
+
+    public gamePuzzles(Long id, Game game, String puzzle, String answer, double x, double y, String hint) {
         this.id = id;
         this.game = game;
         this.puzzle = puzzle;
         this.answer = answer;
         this.x = x;
         this.y = y;
+        this.hint = hint;
     }
-    public gamePuzzles(Game game, String puzzle, String answer, double x, double y) {
+    public gamePuzzles(Game game, String puzzle, String answer, double x, double y, String hint) {
         this.game = game;
         this.puzzle = puzzle;
         this.answer = answer;
         this.x = x;
         this.y = y;
+        this.hint = hint;
     }
 
     public gamePuzzles() {
@@ -76,5 +81,13 @@ public class gamePuzzles {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 }

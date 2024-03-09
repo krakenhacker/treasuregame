@@ -31,4 +31,16 @@
             android:layout_height="wrap_content" android:id="@+id/button"
             app:layout_constraintHorizontal_bias="0.968" app:layout_constraintVertical_bias="0.017" android:maxWidth="120dp"
             android:onClick="TerminateGame"/>
+    <EditText
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textAlignment="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/edittextanswer" tools:layout_editor_absoluteY="318dp"
+            tools:layout_editor_absoluteX="96dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

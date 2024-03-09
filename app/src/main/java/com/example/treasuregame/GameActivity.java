@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.*;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ import java.util.*;
 public class GameActivity extends AppCompatActivity implements LocationListener {
 
     private TextView textViewGame;
+    private EditText editTextAnswer;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,7 +49,9 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     public Game game;
 
     public List<gamePuzzles> gamePuzzlesList;
+    public String gamePuzzleAnswer;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 
         game = (Game) getIntent().getSerializableExtra("Game");
         textViewGame = findViewById(R.id.textViewGame);
+        editTextAnswer = findViewById(R.id.edittextanswer);
         textViewGame.setText(game.toString());
         gameid = Math.toIntExact(game.getId());
         getLocation();
@@ -73,6 +78,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
         }
 
         DisplayGamePuzzle(count);
+
 
 
 
@@ -109,6 +115,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
                             gamePuzzlesList = objectMapper.readValue(response, new TypeReference<List<gamePuzzles>>() {});
                             puzzlelong = gamePuzzlesList.get(puzzlecount).getX();
                             puzzlelat = gamePuzzlesList.get(puzzlecount).getY();
+                            gamePuzzleAnswer = gamePuzzlesList.get(puzzlecount).getAnswer();
                             textViewGame.setText(gamePuzzlesList.get(count).getPuzzle());
 
                         } catch (JsonProcessingException e) {
@@ -149,14 +156,22 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     }
     @Override
     public void onLocationChanged(@NonNull Location location) {
-
-    GetPuzzleCoordinates(count+1);
+        if(gamePuzzleAnswer.equals(editTextAnswer.getText().toString())){
+            count++;
+            editTextAnswer.setVisibility(View.INVISIBLE);
+            textViewGame.setVisibility(View.INVISIBLE);
+        }
+    GetPuzzleCoordinates(count);
 
         if ((Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180)) < 10) && Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180) < 10) {
             Toast.makeText(this, "" + (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180 + "," + location.getLongitude() * 20037508.34 / 180, Toast.LENGTH_SHORT).show();
             DisplayGamePuzzle(count);
-
-            count++;
+            textViewGame.setVisibility(View.VISIBLE);
+            editTextAnswer.setVisibility(View.VISIBLE);
+            if(gamePuzzleAnswer==editTextAnswer.getText().toString()){
+                editTextAnswer.setVisibility(View.INVISIBLE);
+                count++;
+            }
         }
 
     }
