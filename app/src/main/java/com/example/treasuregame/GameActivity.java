@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.*;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,7 +35,11 @@ import java.util.*;
 public class GameActivity extends AppCompatActivity implements LocationListener {
 
     private TextView textViewGame;
+    private TextView texthint;
     private EditText editTextAnswer;
+
+    public Button closeHintButton;
+    public ProgressBar progressBar;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -50,6 +52,7 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
 
     public List<gamePuzzles> gamePuzzlesList;
     public String gamePuzzleAnswer;
+    public String nextPuzzleHint;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -60,16 +63,14 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
         game = (Game) getIntent().getSerializableExtra("Game");
         textViewGame = findViewById(R.id.textViewGame);
         editTextAnswer = findViewById(R.id.edittextanswer);
+        closeHintButton = findViewById(R.id.closehintbutton);
+        texthint = findViewById(R.id.texthint);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
         textViewGame.setText(game.toString());
         gameid = Math.toIntExact(game.getId());
         getLocation();
-//        try {
-//            game = objectMapper.readValue(gamestring, Game.class);
-//            textView.findViewById(R.id.textView);
-//            textView.setText(game.toString());
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
+
         if (ContextCompat.checkSelfPermission(GameActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(GameActivity.this,new String[]{
@@ -116,6 +117,9 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
                             puzzlelong = gamePuzzlesList.get(puzzlecount).getX();
                             puzzlelat = gamePuzzlesList.get(puzzlecount).getY();
                             gamePuzzleAnswer = gamePuzzlesList.get(puzzlecount).getAnswer();
+                            if (puzzlecount<gamePuzzlesList.size()-1) {
+                                 nextPuzzleHint = gamePuzzlesList.get(puzzlecount+1).getHint();
+                            }
                             textViewGame.setText(gamePuzzlesList.get(count).getPuzzle());
 
                         } catch (JsonProcessingException e) {
@@ -156,22 +160,36 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     }
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        if(gamePuzzleAnswer.equals(editTextAnswer.getText().toString())){
+        if(gamePuzzleAnswer.equals(editTextAnswer.getText().toString())&count==0){
             count++;
+            editTextAnswer.setText("");
             editTextAnswer.setVisibility(View.INVISIBLE);
+            texthint.setText(nextPuzzleHint);
+            texthint.setVisibility(View.VISIBLE);
             textViewGame.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            GetPuzzleCoordinates(count);
         }
-    GetPuzzleCoordinates(count);
 
-        if ((Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180)) < 10) && Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180) < 10) {
+        if (getDistanceLat(location) < 10 && getDistanceLong(location) < 10) {
             Toast.makeText(this, "" + (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180 + "," + location.getLongitude() * 20037508.34 / 180, Toast.LENGTH_SHORT).show();
             DisplayGamePuzzle(count);
             textViewGame.setVisibility(View.VISIBLE);
             editTextAnswer.setVisibility(View.VISIBLE);
-            if(gamePuzzleAnswer==editTextAnswer.getText().toString()){
+            progressBar.setVisibility(View.INVISIBLE);
+            if(gamePuzzleAnswer.equals(editTextAnswer.getText().toString())){
+                editTextAnswer.setText("");
                 editTextAnswer.setVisibility(View.INVISIBLE);
+                textViewGame.setVisibility(View.INVISIBLE);
+                texthint.setText(nextPuzzleHint);
+                texthint.setVisibility(View.VISIBLE);
                 count++;
+                GetPuzzleCoordinates(count);
             }
+        }else if (getDistanceLat(location) < 100 && getDistanceLong(location) < 100) {
+            progressBar.setProgress(90-Math.max(getDistanceLat(location),getDistanceLong(location)));
+        }else if (getDistanceLat(location) > 100 && getDistanceLong(location) > 100) {
+            progressBar.setProgress(0);
         }
 
     }
@@ -204,5 +222,16 @@ public class GameActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
+    }
+
+    public int getDistanceLat(Location location){
+        return (int) Math.abs((puzzlelat - (Math.log(Math.tan(((90 + location.getLatitude()) * Math.PI) / 360)) / (Math.PI / 180)) * 20037508.34 / 180));
+    }
+    public int getDistanceLong(Location location){
+        return (int) Math.abs(puzzlelong - location.getLongitude() * 20037508.34 / 180);
+    }
+
+    public void CloseHint(View view) {
+        texthint.setVisibility(View.INVISIBLE);
     }
 }

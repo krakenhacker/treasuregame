@@ -18,6 +18,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:id="@+id/textViewGame" tools:layout_editor_absoluteY="322dp"
             tools:layout_editor_absoluteX="173dp"/>
+    <TextView
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.74"
+            android:textAlignment="center"
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/texthint"
+            app:layout_constraintHorizontal_bias="0.498"/>
     <Button
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,4 +54,28 @@
             android:ems="10"
             android:id="@+id/edittextanswer" tools:layout_editor_absoluteY="318dp"
             tools:layout_editor_absoluteX="96dp"/>
+    <Button
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Close Hint"
+            android:textSize="16sp"
+            android:textColor="#93001B"
+            android:backgroundTint="@color/white"
+            android:layout_width="224dp"
+            android:layout_height="61dp" android:id="@+id/closehintbutton"
+            app:layout_constraintHorizontal_bias="0.498" app:layout_constraintVertical_bias="0.834"
+            android:maxWidth="120dp"
+            android:onClick="CloseHint"/>
+    <ProgressBar
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="301dp"
+            android:layout_height="131dp"
+            android:id="@+id/progressBar" app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintVertical_bias="0.449"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
